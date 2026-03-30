@@ -8,113 +8,105 @@ InsuranceOS é uma plataforma de seguros 100% operada por agentes de IA — inte
 
 ---
 
-## Arquitetura
+## Arquitetura (v0.5)
 
 ```
 insuranceOS/
 ├── insuranceos.py                    ← Entry point (menu interativo + CLI)
 ├── server.py                         ← Webhook WhatsApp (FastAPI)
+├── pico_monitor.py                   ← PicoClaw: renovações + follow-up + health
 │
 ├── orchestrator/
-│   └── orchestrator.py               ← Orquestrador central + roteamento de agentes
+│   └── orchestrator.py               ← Orquestrador central + multi-LLM + session
 │
 ├── modules/                          ← 8 módulos especializados
 │   ├── quote/      agent.py          ← Cotação: auto, vida, saúde, residencial, empresarial
 │   ├── policy/     agent.py          ← Apólices: emissão, renovação, vigência, endosso
-│   ├── claim/      agent.py          ← Sinistros: registro, acompanhamento, regulação
+│   ├── claim/      agent.py          ← Sinistros: registro, acompanhamento, orientações
 │   ├── crm/        agent.py          ← Clientes: leads, histórico, segmentação
-│   ├── sales/      agent.py          ← Vendas: pipeline, comissões, metas, follow-up
+│   ├── sales/      agent.py          ← Vendas: pipeline, follow-up automático, metas
 │   ├── compliance/ agent.py          ← SUSEP, regulatório, auditoria
-│   ├── report/     agent.py          ← Dashboard, relatórios, KPIs
-│   └── atendimento/agent.py          ← Bot WhatsApp: triagem, FAQ, humanização
+│   ├── report/     agent.py          ← Dashboard HTML + KPIs + relatório PDF
+│   └── atendimento/agent.py          ← Sofia: bot WhatsApp com session memory
 │
 ├── tools/
-│   ├── whatsapp.py                   ← Meta Cloud API / Twilio (envio/recebimento)
-│   ├── susep.py                      ← API SUSEP: seguradoras, produtos, habilitação
+│   ├── whatsapp.py                   ← Meta Cloud API (texto, botões, listas, docs)
+│   ├── susep.py                      ← SUSEP: seguradoras habilitadas, regulamentos (v0.3)
+│   ├── rfb.py                        ← Receita Federal: CNPJ via BrasilAPI/ReceitaWS (v0.2)
 │   ├── quote_engine.py               ← Motor de cotação multi-seguradora
 │   ├── notifications.py              ← Telegram + WhatsApp (alertas internos)
-│   ├── crm_sheets.py                 ← Google Sheets: leads, clientes, apólices
-│   ├── pdf_tools.py                  ← Geração de propostas e apólices em PDF
-│   └── rag.py                        ← RAG sobre manuais de produtos e regulamentos
+│   ├── crm_sheets.py                 ← Google Sheets: leads, clientes, apólices, sinistros
+│   ├── pdf_tools.py                  ← Propostas e relatórios em PDF (v0.3)
+│   ├── rag.py                        ← RAG: condições gerais, manuais, circulares (v0.3)
+│   ├── swarm.py                      ← Swarm de agentes para análise de cotações (v0.3)
+│   ├── session.py                    ← Session memory por usuário (v0.4)
+│   ├── llm.py                        ← Multi-LLM: Gemini, Claude, GPT-4o, Ollama (v0.2)
+│   ├── ensemble.py                   ← Multi-LLM ensemble para decisões críticas (v0.5)
+│   └── commissions.py                ← Calculadora e relatório de comissões (v0.5)
 │
 ├── autoresearch/
-│   └── sales_loop.py                 ← AutoResearch: otimização de conversão
+│   └── sales_loop.py                 ← AutoResearch: otimização de conversão (v0.4)
 │
 └── _insuranceos/
     ├── _memory/
     │   ├── company_profile.md        ← Perfil da corretora (configure aqui)
-    │   └── products.json             ← Catálogo de produtos e seguradoras parceiras
-    └── documentos/                   ← RAG: manuais, condições gerais, tabelas
+    │   ├── products.json             ← Catálogo de produtos e seguradoras
+    │   └── sales_strategy.json       ← Estratégia otimizada pelo AutoResearch
+    ├── sessions/                     ← Session memory por usuário (v0.4)
+    └── documentos/                   ← RAG: manuais, condições gerais, tabelas (v0.3)
 ```
 
 ---
 
-## Módulos
+## Módulos & Versões
 
-| Módulo | Função | Status |
-|--------|--------|--------|
-| **Quote** | Cotação multi-ramo: auto, vida, saúde, residencial, empresarial | 🔨 v0.1 |
-| **Policy** | Emissão, renovação, endosso, cancelamento de apólices | 🔨 v0.1 |
-| **Claim** | Registro e acompanhamento de sinistros | 🔨 v0.1 |
-| **CRM** | Gestão de leads, clientes, histórico e segmentação | 🔨 v0.1 |
-| **Sales** | Pipeline, follow-up automático, comissões, metas | 🔨 v0.1 |
-| **Compliance** | Conformidade SUSEP, auditoria, relatórios regulatórios | 🔨 v0.1 |
-| **Report** | Dashboard KPIs: conversão, prêmios, sinistralidade | 🔨 v0.1 |
-| **Atendimento** | Bot WhatsApp: triagem, cotação rápida, FAQ, escalada humana | 🔨 v0.1 |
-
----
-
-## Stack Tecnológico
-
-- **LLM**: Google Gemini (via ADK) ou multi-LLM (OpenAI, Anthropic, Ollama)
-- **Framework de Agentes**: Google ADK (Python)
-- **Mensageria**: WhatsApp (Meta Cloud API) + Telegram
-- **Storage**: Google Sheets + SQLite (local) / PostgreSQL (produção)
-- **PDF**: ReportLab / WeasyPrint
-- **API SUSEP**: dados de seguradoras e produtos
-- **Infra**: Docker + docker-compose (1 container por módulo)
-
----
-
-## Configuração Rápida
-
-```bash
-cp .env.example .env
-# Edite o .env com suas credenciais
-
-pip install -r requirements.txt
-
-python insuranceos.py
-```
+| Módulo / Feature | Função | Status |
+|------------------|--------|--------|
+| **Atendimento** (Sofia) | Bot WhatsApp: triagem, FAQ, cotação rápida | ✅ v0.1 |
+| **Quote** | Cotação multi-ramo e multi-seguradora | ✅ v0.1 |
+| **Claim** | Sinistros: registro, protocolo, orientações | ✅ v0.1 |
+| **Policy** | Apólices: 2ª via, renovação, endosso | ✅ v0.1 |
+| **Sales** | Pipeline, follow-up, conversão | ✅ v0.1 |
+| **CRM** | Leads e clientes via Google Sheets | ✅ v0.1 |
+| **Compliance** | SUSEP, regulatório, auditoria | ✅ v0.1 |
+| **Report** | KPIs em texto e dashboard HTML | ✅ v0.1 |
+| **Multi-LLM** | Gemini, Claude, GPT-4o, Ollama | ✅ v0.2 |
+| **RFB / CNPJ** | Consulta CNPJ via BrasilAPI | ✅ v0.2 |
+| **PicoClaw Monitor** | Renovações + leads frios + health check | ✅ v0.2 |
+| **SUSEP Tool** | Seguradoras habilitadas por ramo | ✅ v0.3 |
+| **RAG Documentos** | Busca em condições gerais e manuais | ✅ v0.3 |
+| **PDF Propostas** | Propostas e relatórios em PDF | ✅ v0.3 |
+| **Swarm Análise** | Multi-agente paralelo para cotações | ✅ v0.3 |
+| **Session Memory** | Contexto de conversa persistido por usuário | ✅ v0.4 |
+| **Dashboard HTML** | Dashboard executivo com gráficos | ✅ v0.4 |
+| **AutoResearch** | Sales loop: otimização de conversão por IA | ✅ v0.4 |
+| **Ensemble LLM** | Multi-LLM consensus para decisões críticas | ✅ v0.5 |
+| **Comissões** | Calculadora e relatório de comissões | ✅ v0.5 |
+| **LLM Orchestration** | Roteamento com fallback LLM para intenções ambíguas | ✅ v0.5 |
 
 ---
 
-## Variáveis de Ambiente
+## Provedores de LLM
+
+Configure no `.env`:
 
 ```env
-# LLM
-GOOGLE_API_KEY=
-GEMINI_MODEL=gemini-2.0-flash
+# Provedor padrão
+INSURANCEOS_LLM_PROVIDER=gemini  # gemini | anthropic | openai | ollama
 
-# WhatsApp (Meta Cloud API)
-WHATSAPP_TOKEN=
-WHATSAPP_PHONE_NUMBER_ID=
-WHATSAPP_VERIFY_TOKEN=
-
-# Google Sheets (CRM)
-GOOGLE_SHEETS_ID=
-GOOGLE_SHEETS_CREDENTIALS_FILE=credentials.json
-
-# Telegram (alertas internos)
-TELEGRAM_BOT_TOKEN=
-TELEGRAM_CHAT_ID=
-
-# Segurança
-WEBHOOK_TOKEN=
-
-# Servidor
-PORT=8080
+# Chaves (configure apenas o(s) que usar)
+GOOGLE_API_KEY=...           # Gemini 2.0 Flash (padrão, mais rápido)
+ANTHROPIC_API_KEY=...        # Claude Opus 4.6 (melhor raciocínio)
+OPENAI_API_KEY=...           # GPT-4o (alternativa)
+OLLAMA_BASE_URL=http://localhost:11434  # Ollama local (offline)
 ```
+
+| Provedor | Modelo padrão | Ponto forte | Ideal para |
+|----------|--------------|-------------|------------|
+| **Gemini** | gemini-2.0-flash | Rápido, multimodal, gratuito | Atendimento, cotação |
+| **Anthropic** | claude-opus-4-6 | Raciocínio, instrução longa | Sinistros complexos, compliance |
+| **OpenAI** | gpt-4o | Coding, estruturado | AutoResearch, análises |
+| **Ollama** | llama3.2 | Offline, privado | Dados sensíveis, local |
 
 ---
 
@@ -123,20 +115,74 @@ PORT=8080
 ```
 Cliente envia mensagem
         ↓
-   Webhook recebe
+   Webhook (FastAPI)
         ↓
- Atendimento/Agent
-   (triagem NLP)
+ Session Memory carrega histórico
         ↓
-┌───────┼───────────┬──────────────┐
-│       │           │              │
-Cotação  Sinistro  2ª via boleto  Falar com corretor
-│       │           │              │
-Quote   Claim     Policy        Escalada humana
-Agent   Agent     Agent         (Telegram alert)
-│       │           │
-└───────┴───────────┘
+ Orquestrador (regex + LLM fallback)
+   classifica intenção
+        ↓
+┌───────┬──────────┬───────────┬──────────────┬─────┐
+│       │          │           │              │     │
+Cotação Sinistro  Apólice    Vendas        CNPJ  RAG
+│       │          │           │
+Quote   Claim    Policy     Sales
+Agent   Agent    Agent      Agent
+│       │
+Swarm  Telegram
+(v0.3)  alert
+│
+Ensemble
+(v0.5)
         ↓
  Resposta WhatsApp
   + CRM atualizado
+  + Session salva
+```
+
+---
+
+## Setup Rápido
+
+```bash
+git clone https://github.com/PAMF2/insuranceOS
+cd insuranceOS
+
+pip install -r requirements.txt
+
+cp .env.example .env
+# Edite o .env com suas credenciais
+
+# 1. Configure a corretora
+nano _insuranceos/_memory/company_profile.md
+
+# 2. Inicie o webhook
+python insuranceos.py --server
+
+# 3. (Opcional) PicoClaw Monitor em paralelo
+python pico_monitor.py
+
+# 4. (Opcional) AutoResearch sales loop
+python autoresearch/sales_loop.py 5
+```
+
+---
+
+## Docker
+
+```bash
+docker-compose up -d
+```
+
+---
+
+## Comandos CLI
+
+```bash
+python insuranceos.py                  # Menu interativo
+python insuranceos.py quote "auto"     # Cotação direta
+python insuranceos.py report html      # Gerar dashboard HTML
+python insuranceos.py --server         # Iniciar webhook WhatsApp
+python pico_monitor.py                 # Monitor de renovações + follow-up
+python autoresearch/sales_loop.py 5    # 5 iterações de otimização
 ```
