@@ -1,0 +1,30 @@
+version: "3.9"
+
+services:
+  webhook:
+    build: .
+    container_name: insuranceos-webhook
+    command: python server.py
+    ports:
+      - "${PORT:-8080}:8080"
+    env_file: .env
+    restart: unless-stopped
+    volumes:
+      - ./_insuranceos:/app/_insuranceos
+      - ./credentials.json:/app/credentials.json:ro
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  adk:
+    build: .
+    container_name: insuranceos-adk
+    command: adk api_server insurance_agent
+    ports:
+      - "8000:8000"
+    env_file: .env
+    restart: unless-stopped
+    depends_on:
+      - webhook

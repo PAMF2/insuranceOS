@@ -1,0 +1,45 @@
+{
+  "ramos": {
+    "auto": {
+      "coberturas": ["compreensiva", "terceiros", "basica"],
+      "franquias": ["obrigatorio", "reduzida", "normal", "majorada"],
+      "assistencias": ["basica", "plus", "premium"],
+      "seguradoras_ativas": ["Porto Seguro", "Tokio Marine", "Allianz", "HDI", "Bradesco Seguros"]
+    },
+    "vida": {
+      "tipos": ["individual", "grupo", "empresarial"],
+      "coberturas": ["morte", "invalidez_permanente", "doencas_graves", "diaria_internacao"],
+      "prazo_minimo_anos": 1,
+      "prazo_maximo_anos": 30,
+      "seguradoras_ativas": ["MetLife", "Prudential", "SulAmérica", "Itaú Seguros"]
+    },
+    "saude": {
+      "tipos": ["individual", "familiar", "empresarial"],
+      "coberturas": ["ambulatorial", "hospitalar", "obstetrico", "odontologico"],
+      "operadoras_ativas": ["Amil", "SulAmérica", "Bradesco Saúde", "NotreDame Intermédica"]
+    },
+    "residencial": {
+      "tipos": ["apartamento", "casa", "condominio"],
+      "coberturas": ["incendio", "roubo", "danos_eletricos", "vendaval", "responsabilidade_civil"],
+      "seguradoras_ativas": ["Porto Seguro", "Allianz", "Liberty", "Tokio Marine"]
+    },
+    "empresarial": {
+      "tipos": ["pequeno_negocio", "multiriscos", "responsabilidade_civil", "equipamentos"],
+      "seguradoras_ativas": ["Zurich", "Mapfre", "Allianz", "Sompo", "AIG"]
+    }
+  },
+  "comissoes": {
+    "auto": 0.10,
+    "vida": 0.20,
+    "saude": 0.08,
+    "residencial": 0.15,
+    "empresarial": 0.12
+  },
+  "prazo_validade_cotacao_dias": {
+    "auto": 7,
+    "vida": 30,
+    "saude": 15,
+    "residencial": 15,
+    "empresarial": 30
+  }
+}

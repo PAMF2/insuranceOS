@@ -1,0 +1,13 @@
+.env
+credentials.json
+*.pyc
+__pycache__/
+.venv/
+venv/
+*.egg-info/
+dist/
+build/
+output/
+_insuranceos/documentos/
+*.log
+.DS_Store
